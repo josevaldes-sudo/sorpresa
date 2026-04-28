@@ -1,219 +1,202 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Para ti 💖</title>
-  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&family=Quicksand:wght@500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --pink-50: #fff5f9;
-      --pink-100: #ffe6f2;
-      --pink-200: #ffcce6;
-      --pink-300: #ffb3d9;
-      --pink-400: #ff80bf;
-      --pink-500: #ff4da6;
-      --pink-600: #e04f8a;
-      --text-dark: #7a3062;
-      --glass: rgba(255, 255, 255, 0.7);
-      --shadow: 0 8px 24px rgba(224, 79, 138, 0.2);
+      --bg-main: linear-gradient(160deg, #ffe6f2 0%, #ffcce6 100%);
+      --glass: rgba(255, 255, 255, 0.65);
+      --glass-border: rgba(255, 255, 255, 0.4);
+      --shadow-soft: 0 8px 24px rgba(224, 79, 138, 0.18);
+      --shadow-hover: 0 12px 32px rgba(224, 79, 138, 0.28);
+      --text-main: #7a3062;
+      --accent: #e04f8a;
+      --accent-light: #ff80bf;
       --safe-top: env(safe-area-inset-top, 0px);
       --safe-bottom: env(safe-area-inset-bottom, 0px);
+    }
+    body.winter-mode {
+      --bg-main: linear-gradient(160deg, #e0f2fe 0%, #dbeafe 100%);
+      --glass: rgba(255, 255, 255, 0.8);
+      --glass-border: rgba(148, 163, 184, 0.3);
+      --shadow-soft: 0 8px 24px rgba(59, 130, 246, 0.12);
+      --shadow-hover: 0 12px 32px rgba(59, 130, 246, 0.22);
+      --text-main: #334155;
+      --accent: #2563eb;
+      --accent-light: #60a5fa;
     }
 
     * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     body {
       font-family: 'Nunito', sans-serif;
-      background: linear-gradient(135deg, var(--pink-100), var(--pink-200));
+      background: var(--bg-main);
       height: 100vh; width: 100vw;
       overflow: hidden;
-      color: var(--text-dark);
-      padding-top: var(--safe-top);
-      padding-bottom: var(--safe-bottom);
+      color: var(--text-main);
+      padding: var(--safe-top) 0 var(--safe-bottom);
+      transition: background 0.5s ease, color 0.5s ease;
+      position: relative;
     }
 
-    /* SISTEMA DE PANTALLAS */
-    .screen {
-      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      opacity: 0; visibility: hidden; pointer-events: none;
-      transition: opacity 0.4s ease, visibility 0.4s;
-      display: flex; flex-direction: column; align-items: center;
-      overflow-y: auto; overflow-x: hidden;
-    }
+    /* FONDO SUAVE */
+    .bg-shapes { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+    .shape { position: absolute; border-radius: 50%; filter: blur(60px); opacity: 0.3; animation: floatShape 18s ease-in-out infinite alternate; }
+    .s1 { width: 300px; height: 300px; background: var(--accent-light); top: -5%; left: -10%; }
+    .s2 { width: 250px; height: 250px; background: var(--accent); bottom: 5%; right: -8%; animation-delay: -8s; }
+    @keyframes floatShape { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(25px, 35px) scale(1.1); } }
+
+    /* PANTALLAS */
+    .screen { position: fixed; inset: 0; opacity: 0; visibility: hidden; pointer-events: none; transition: opacity 0.4s ease, visibility 0.4s; display: flex; flex-direction: column; overflow-y: auto; z-index: 5; }
     .screen.active { opacity: 1; visibility: visible; pointer-events: auto; }
 
     /* PANTALLA PRINCIPAL */
-    #main-screen {
-      background: linear-gradient(135deg, var(--pink-50), var(--pink-200));
-      z-index: 10; padding: 1.5rem 1rem;
-      justify-content: flex-start;
-      padding-bottom: calc(5rem + var(--safe-bottom));
+    #main-screen { padding: 1.2rem 1rem calc(5.5rem + var(--safe-bottom)); align-items: center; }
+    
+    /* HORA + CLIMA */
+    .info-pill {
+      background: var(--glass); backdrop-filter: blur(10px); border: 1px solid var(--glass-border);
+      padding: 0.4rem 0.8rem; border-radius: 50px; box-shadow: var(--shadow-soft);
+      display: flex; align-items: center; gap: 0.6rem; margin-bottom: 1rem; width: fit-content;
+      font-size: 0.85rem; font-weight: 600; color: var(--text-main);
     }
+    .info-pill span { white-space: nowrap; }
+    #weather { opacity: 0.9; }
+    #greeting { opacity: 0.85; }
+
+    /* TARJETAS DE MENSAJES */
     .messages-grid {
       display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-      gap: 1rem; width: 100%; max-width: 900px; margin-bottom: 1.5rem;
+      gap: 1rem; width: 100%; max-width: 900px; margin-bottom: 1.2rem;
     }
     .msg-card {
-      background: var(--glass); backdrop-filter: blur(8px); padding: 1.2rem;
-      border-radius: 16px; box-shadow: var(--shadow); text-align: center;
-      cursor: text; transition: all 0.25s; min-height: 80px;
+      background: var(--glass); backdrop-filter: blur(10px); border: 1px solid var(--glass-border);
+      padding: 1.2rem; border-radius: 18px; box-shadow: var(--shadow-soft); text-align: center;
+      position: relative; transition: all 0.25s; min-height: 85px;
       display: flex; align-items: center; justify-content: center;
     }
-    .msg-card:hover { transform: translateY(-3px) rotate(-1deg); box-shadow: 0 10px 25px rgba(224,79,138,0.25); }
-    .msg-card:focus { outline: 2px dashed var(--pink-400); background: #fff9fd; }
-    .msg-card p { font-family: 'Quicksand', sans-serif; font-size: 1.1rem; font-weight: 600; line-height: 1.5; }
+    .msg-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-hover); }
+    .msg-card:focus { outline: 2px dashed var(--accent-light); background: #fff9fd; }
+    .msg-card p { font-family: 'Quicksand', sans-serif; font-size: 1.1rem; font-weight: 600; line-height: 1.5; pointer-events: none; }
+    
+    .msg-card.is-editable { cursor: grab; border-color: var(--accent-light); }
+    .msg-card.is-editable p { pointer-events: auto; cursor: text; }
+    .msg-card.is-editable.dragging { cursor: grabbing; box-shadow: 0 15px 35px rgba(0,0,0,0.15); z-index: 50; }
+    
+    .edit-btn {
+      position: absolute; top: 6px; right: 6px;
+      width: 28px; height: 28px; background: rgba(255,255,255,0.8); border: 1px solid var(--glass-border);
+      border-radius: 50%; cursor: pointer; font-size: 0.9rem;
+      display: flex; align-items: center; justify-content: center; transition: 0.2s;
+      opacity: 0.6;
+    }
+    .edit-btn:hover, .edit-btn.active { opacity: 1; background: white; transform: scale(1.1); }
+    .edit-btn.active { box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
 
-    .main-buttons {
-      display: flex; gap: 0.8rem; flex-wrap: wrap; justify-content: center;
-      width: 100%; max-width: 400px; margin-bottom: 1rem;
-    }
-    .btn {
-      border: none; padding: 0.9rem 1.5rem; font-size: 1.05rem; font-weight: 700;
-      border-radius: 50px; cursor: pointer; transition: all 0.2s cubic-bezier(0.175,0.885,0.32,1.275);
-      box-shadow: 0 6px 15px rgba(0,0,0,0.12); flex: 1; min-width: 140px;
-    }
-    #hug-btn { background: linear-gradient(45deg, var(--pink-400), var(--pink-600)); color: white; }
-    #notes-btn { background: white; color: var(--pink-600); border: 2px solid var(--pink-300); }
+    /* BOTONES PRINCIPALES */
+    .main-buttons { display: flex; gap: 0.8rem; flex-wrap: wrap; justify-content: center; width: 100%; max-width: 400px; margin-bottom: 1rem; }
+    .btn { border: none; padding: 0.9rem 1.5rem; font-size: 1.05rem; font-weight: 700; border-radius: 50px; cursor: pointer; transition: all 0.2s cubic-bezier(0.175,0.885,0.32,1.275); box-shadow: 0 6px 15px rgba(0,0,0,0.12); flex: 1; min-width: 140px; }
+    #hug-btn { background: linear-gradient(45deg, var(--accent-light), var(--accent)); color: white; }
+    #notes-btn { background: white; color: var(--accent); border: 2px solid var(--accent-light); }
     .btn:active { transform: scale(0.96); }
 
-    /* MUSICA */
-    #music-bar {
+    /* REPRODUCTOR MINIMALISTA */
+    .music-player {
       position: fixed; bottom: calc(1rem + var(--safe-bottom)); left: 50%; transform: translateX(-50%);
-      background: var(--glass); padding: 0.6rem 1.2rem; border-radius: 20px;
-      display: flex; align-items: center; gap: 0.6rem; box-shadow: var(--shadow);
-      font-size: 0.85rem; z-index: 20; white-space: nowrap;
-      max-width: 95vw;
+      background: var(--glass); backdrop-filter: blur(12px); border: 1px solid var(--glass-border);
+      padding: 0.4rem 0.6rem; border-radius: 50px; display: flex; align-items: center; gap: 0.4rem;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.15); z-index: 20;
     }
-    #music-bar input { display: none; }
-    .music-btn {
-      background: var(--pink-200); color: var(--pink-600); border: none;
-      padding: 0.4rem 0.8rem; border-radius: 10px; cursor: pointer; font-weight: 600;
-      transition: 0.2s; flex-shrink: 0;
+    .ctrl-btn { background: var(--accent-light); color: white; border: none; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 0.95rem; transition: 0.2s; flex-shrink: 0; }
+    .ctrl-btn:hover { background: var(--accent); }
+    .ctrl-btn:active { transform: scale(0.92); }
+    .vol-controls { display: flex; align-items: center; gap: 0.3rem; }
+    .vol-controls input[type="range"] {
+      width: 65px; height: 5px; -webkit-appearance: none; appearance: none;
+      background: rgba(255,255,255,0.6); border-radius: 3px; outline: none; cursor: pointer;
     }
-    #music-name { color: #b36b99; font-size: 0.8rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 150px; }
+    .vol-controls input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none; width: 14px; height: 14px; background: var(--accent);
+      border-radius: 50%; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
 
     /* PANTALLA NOTAS */
-    #notes-screen { background: radial-gradient(circle at 30% 30%, var(--pink-100), var(--pink-200)); z-index: 30; }
+    #notes-screen { z-index: 30; }
     .falling-flowers { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; overflow: hidden; }
-    .flower {
-      position: absolute; top: -50px; font-size: 1.8rem;
-      animation: flowerFall linear forwards; opacity: 0.75;
-    }
-    @keyframes flowerFall {
-      0% { transform: translateY(0) rotate(0deg); opacity: 0; }
-      10% { opacity: 0.85; }
-      90% { opacity: 0.85; }
-      100% { transform: translateY(110vh) rotate(25deg); opacity: 0; }
-    }
+    .flower, .snow { position: absolute; top: -50px; font-size: 1.6rem; animation: fallGentle linear forwards; opacity: 0.7; }
+    @keyframes fallGentle { 0% { transform: translateY(0) rotate(0deg); opacity: 0; } 10% { opacity: 0.8; } 90% { opacity: 0.8; } 100% { transform: translateY(110vh) rotate(15deg); opacity: 0; } }
+    .notes-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; padding-top: calc(45px + var(--safe-top)); padding-bottom: calc(60px + var(--safe-bottom)); }
+    .sticky-note { position: absolute; width: 160px; min-height: 120px; background: linear-gradient(135deg, #fff9fb, #ffe6f2); border: 2px solid var(--accent-light); border-radius: 12px; padding: 10px; box-shadow: var(--shadow-soft); font-size: 0.9rem; line-height: 1.4; cursor: grab; user-select: none; transition: box-shadow 0.2s; }
+    body.winter-mode .sticky-note { background: linear-gradient(135deg, #f8fafc, #e0f2fe); border-color: #bfdbfe; }
+    .sticky-note.dragging { cursor: grabbing; box-shadow: 0 15px 35px rgba(0,0,0,0.15); z-index: 999; transform: rotate(-1deg); }
+    .sticky-note textarea { width: 100%; height: 85px; background: transparent; border: none; resize: none; font-family: 'Nunito', sans-serif; font-size: 0.95rem; color: var(--text-main); outline: none; }
+    .note-delete { position: absolute; top: -6px; right: -6px; width: 20px; height: 20px; background: var(--accent); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 0.75rem; font-weight: bold; box-shadow: 0 2px 6px rgba(0,0,0,0.2); }
+    .fab-add { position: fixed; bottom: calc(1.5rem + var(--safe-bottom)); right: 1.5rem; width: 50px; height: 50px; background: var(--accent); color: white; border: none; border-radius: 50%; font-size: 1.8rem; cursor: pointer; box-shadow: 0 8px 20px rgba(0,0,0,0.2); z-index: 40; transition: transform 0.3s, background 0.2s; }
+    .fab-add:hover { transform: scale(1.1) rotate(90deg); }
 
-    .notes-canvas {
-      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-      padding-top: calc(45px + var(--safe-top));
-      padding-bottom: calc(60px + var(--safe-bottom));
-    }
-    .sticky-note {
-      position: absolute; width: 160px; min-height: 120px;
-      background: linear-gradient(135deg, #fff9fb, #ffe6f2);
-      border: 2px solid #ffcce6; border-radius: 12px; padding: 10px;
-      box-shadow: 0 6px 18px rgba(200, 80, 140, 0.25);
-      font-size: 0.9rem; line-height: 1.4; cursor: grab; user-select: none;
-      transition: box-shadow 0.2s;
-    }
-    .sticky-note.dragging { cursor: grabbing; box-shadow: 0 15px 35px rgba(0,0,0,0.2); z-index: 999; transform: rotate(-1deg); }
-    .sticky-note textarea {
-      width: 100%; height: 85px; background: transparent; border: none;
-      resize: none; font-family: 'Nunito', sans-serif; font-size: 0.95rem;
-      color: var(--text-dark); outline: none;
-    }
-    .note-delete {
-      position: absolute; top: -6px; right: -6px; width: 20px; height: 20px;
-      background: #ff6b9d; color: white; border-radius: 50%; display: flex;
-      align-items: center; justify-content: center; cursor: pointer;
-      font-size: 0.75rem; font-weight: bold; box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-    }
-
-    .fab-add {
-      position: fixed; bottom: calc(1.5rem + var(--safe-bottom)); right: 1.5rem;
-      width: 50px; height: 50px; background: var(--pink-500); color: white;
-      border: none; border-radius: 50%; font-size: 1.8rem; cursor: pointer;
-      box-shadow: 0 8px 20px rgba(255,77,166,0.4); z-index: 40;
-      transition: transform 0.3s, background 0.2s;
-    }
-    .fab-add:hover { transform: scale(1.1) rotate(90deg); background: var(--pink-600); }
+    /* BOTON MODO INVIERNO */
+    .winter-btn { position: fixed; bottom: calc(1.5rem + var(--safe-bottom)); left: 1.5rem; width: 44px; height: 44px; background: var(--glass); border: 2px solid var(--accent-light); border-radius: 50%; font-size: 1.3rem; cursor: pointer; box-shadow: var(--shadow-soft); z-index: 40; transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; }
+    .winter-btn:hover { transform: scale(1.1) rotate(15deg); }
+    .winter-btn.active { background: #dbeafe; border-color: #93c5fd; }
 
     /* PANTALLA ABRAZO */
-    #hug-screen {
-      background: radial-gradient(circle at 50% 50%, var(--pink-200), var(--pink-400));
-      z-index: 50; clip-path: circle(0% at 50% 50%);
-      transition: clip-path 0.8s cubic-bezier(0.4,0,0.2,1);
-    }
+    #hug-screen { background: radial-gradient(circle at 50% 50%, var(--accent-light), var(--accent)); z-index: 50; clip-path: circle(0% at 50% 50%); transition: clip-path 0.8s cubic-bezier(0.4,0,0.2,1); }
+    body.winter-mode #hug-screen { background: radial-gradient(circle at 50% 50%, #dbeafe, #93c5fd, #60a5fa); }
     #hug-screen.active { clip-path: circle(150% at 50% 50%); }
     .falling-phrases { position: absolute; top:0; left:0; width:100%; height:100%; pointer-events:none; overflow:hidden; }
-    .phrase-drop {
-      position: absolute; font-family: 'Quicksand', sans-serif;
-      font-size: 1.1rem; font-weight: 700; color: white;
-      text-shadow: 0 2px 6px rgba(140,40,90,0.35); white-space: nowrap;
-      animation: phraseFall linear forwards;
-    }
-    @keyframes phraseFall {
-      0% { transform: translateY(-40px); opacity: 0; }
-      10% { opacity: 0.9; }
-      90% { opacity: 0.9; }
-      100% { transform: translateY(105vh); opacity: 0; }
-    }
-
-    /* BOTONES DE VOLVER (FIJOS Y SEGUROS) */
-    .back-btn {
-      position: fixed; top: calc(1rem + var(--safe-top)); left: 1rem;
-      background: white; color: var(--pink-600); border: 2px solid var(--pink-300);
-      padding: 0.6rem 1.2rem; border-radius: 20px; font-weight: 700;
-      cursor: pointer; z-index: 100; box-shadow: var(--shadow);
-    }
-    .back-btn:hover { transform: translateX(-3px); background: #fff8fb; }
-    
-    #back-hug {
-      position: fixed; bottom: calc(2rem + var(--safe-bottom)); left: 50%; transform: translateX(-50%);
-      background: white; color: var(--pink-600); border: none;
-      padding: 0.9rem 2rem; font-size: 1rem; font-weight: 700;
-      border-radius: 30px; cursor: pointer; z-index: 100;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.15); width: 85%; max-width: 300px; text-align: center;
-    }
+    .phrase-drop { position: absolute; font-family: 'Quicksand', sans-serif; font-size: 1.1rem; font-weight: 700; color: white; text-shadow: 0 2px 6px rgba(0,0,0,0.2); white-space: nowrap; animation: phraseFall linear forwards; }
+    @keyframes phraseFall { 0% { transform: translateY(-40px); opacity: 0; } 10% { opacity: 0.9; } 90% { opacity: 0.9; } 100% { transform: translateY(105vh); opacity: 0; } }
+    .back-btn { position: fixed; top: calc(1rem + var(--safe-top)); left: 1rem; background: white; color: var(--accent); border: 2px solid var(--accent-light); padding: 0.6rem 1.2rem; border-radius: 20px; font-weight: 700; cursor: pointer; z-index: 100; box-shadow: var(--shadow-soft); }
+    .back-btn:hover { transform: translateX(-3px); }
+    #back-hug { position: fixed; bottom: calc(2rem + var(--safe-bottom)); left: 50%; transform: translateX(-50%); background: white; color: var(--accent); border: none; padding: 0.9rem 2rem; font-size: 1rem; font-weight: 700; border-radius: 30px; cursor: pointer; z-index: 100; box-shadow: 0 8px 20px rgba(0,0,0,0.15); width: 85%; max-width: 300px; text-align: center; }
     #back-hug:active { transform: translateX(-50%) scale(0.97); }
 
-    /* RESPONSIVE MÓVIL */
-    @media (max-width: 768px) {
-      .messages-grid { grid-template-columns: 1fr; gap: 0.8rem; margin-bottom: 1rem; }
-      .msg-card { padding: 1rem; min-height: 70px; }
-      .msg-card p { font-size: 1rem; }
-      .main-buttons { flex-direction: column; width: 100%; max-width: 90%; margin: 0 auto 1rem; }
-      .btn { width: 100%; min-width: unset; padding: 0.95rem; font-size: 1.05rem; }
-      #main-screen { padding-top: 1rem; padding-bottom: calc(5.5rem + var(--safe-bottom)); }
-      .sticky-note { width: 140px; min-height: 110px; font-size: 0.85rem; }
-      .sticky-note textarea { height: 75px; font-size: 0.9rem; }
-      .fab-add { width: 46px; height: 46px; font-size: 1.6rem; right: 1rem; }
-      #music-bar { padding: 0.5rem 1rem; font-size: 0.8rem; }
-      #music-name { max-width: 120px; }
-    }
+    /* TAP FLOTANTE */
+    @keyframes floatUp { 0% { transform: translateY(0) scale(0.8); opacity: 0; } 20% { transform: translateY(-15px) scale(1); opacity: 1; } 100% { transform: translateY(-80px) scale(0.5); opacity: 0; } }
 
+    /* RESPONSIVE */
+    @media (max-width: 768px) {
+      .info-pill { font-size: 0.8rem; padding: 0.35rem 0.7rem; }
+      .messages-grid { grid-template-columns: 1fr; gap: 0.8rem; }
+      .msg-card { padding: 1rem; min-height: 75px; }
+      .msg-card p { font-size: 1rem; }
+      .main-buttons { flex-direction: column; width: 100%; max-width: 90%; }
+      .btn { width: 100%; min-width: unset; padding: 0.95rem; }
+      .music-player { padding: 0.4rem 0.5rem; gap: 0.3rem; bottom: calc(0.8rem + var(--safe-bottom)); }
+      .vol-controls input[type="range"] { width: 50px; }
+      .sticky-note { width: 140px; min-height: 110px; }
+      .fab-add { width: 46px; height: 46px; font-size: 1.6rem; right: 1rem; }
+      .winter-btn { width: 40px; height: 40px; font-size: 1.1rem; left: 1rem; }
+    }
     @media (max-width: 380px) {
       .msg-card p { font-size: 0.95rem; }
       .btn { padding: 0.85rem; font-size: 0.95rem; }
       .sticky-note { width: 125px; min-height: 100px; }
+      .music-player { flex-wrap: wrap; justify-content: center; border-radius: 20px; padding-bottom: 0.5rem; }
     }
   </style>
 </head>
 <body>
 
+  <div class="bg-shapes"><div class="shape s1"></div><div class="shape s2"></div></div>
+
   <!-- PANTALLA PRINCIPAL -->
   <div id="main-screen" class="screen active">
+    <div class="info-pill">
+      <span id="greeting">Hola ✨</span>
+      <span id="clock">--:--</span>
+      <span id="weather">⏳ Clima...</span>
+    </div>
+
     <div class="messages-grid">
-      <div class="msg-card" contenteditable="true"><p>✨ Hoy es un nuevo día para respirar profundo</p></div>
-      <div class="msg-card" contenteditable="true"><p>💖 Eres más fuerte de lo que tu mente te dice</p></div>
-      <div class="msg-card" contenteditable="true"><p>🌸 Tu presencia alegra el mundo sin que lo notes</p></div>
-      <div class="msg-card" contenteditable="true"><p>🕊️ Está bien no estar bien, pero no estás sola</p></div>
-      <div class="msg-card" contenteditable="true"><p>🌷 Mereces paz, amor y días tranquilos</p></div>
-      <div class="msg-card" contenteditable="true"><p>🌙 Tu luz brilla incluso en los días nublados</p></div>
+      <div class="msg-card" contenteditable="false"><p>✨ Hoy es un nuevo día para respirar profundo</p><button class="edit-btn" title="Editar">✏️</button></div>
+      <div class="msg-card" contenteditable="false"><p>💖 Eres más fuerte de lo que tu mente te dice</p><button class="edit-btn" title="Editar">✏️</button></div>
+      <div class="msg-card" contenteditable="false"><p>🌸 Tu presencia alegra el mundo sin que lo notes</p><button class="edit-btn" title="Editar">✏️</button></div>
+      <div class="msg-card" contenteditable="false"><p>🕊️ Está bien no estar bien, pero no estás sola</p><button class="edit-btn" title="Editar">✏️</button></div>
+      <div class="msg-card" contenteditable="false"><p>🌷 Mereces paz, amor y días tranquilos</p><button class="edit-btn" title="Editar">✏️</button></div>
+      <div class="msg-card" contenteditable="false"><p>🌙 Tu luz brilla incluso en los días nublados</p><button class="edit-btn" title="Editar">✏️</button></div>
     </div>
 
     <div class="main-buttons">
@@ -221,13 +204,15 @@
       <button id="notes-btn" class="btn">📝 Muro de Notas</button>
     </div>
 
-    <div id="music-bar">
-      <span>🎵</span>
-      <label class="music-btn" for="music-input">Elegir música</label>
-      <input type="file" id="music-input" accept="audio/*">
-      <span id="music-name">Sin música</span>
-      <audio id="bg-music" loop></audio>
+    <div class="music-player">
+      <button id="play-btn" class="ctrl-btn">▶</button>
+      <div class="vol-controls">
+        <button id="vol-down" class="ctrl-btn">🔉</button>
+        <input type="range" id="vol-slider" min="0" max="1" step="0.05" value="0.5">
+        <button id="vol-up" class="ctrl-btn">🔊</button>
+      </div>
     </div>
+    <audio id="bg-music" loop preload="auto"><source src="zoe.weba" type="audio/webm"></audio>
   </div>
 
   <!-- PANTALLA NOTAS -->
@@ -244,6 +229,8 @@
     <button id="back-hug">← Volver a la calma</button>
   </div>
 
+  <button id="winter-toggle" class="winter-btn" title="Modo Calma/Invierno">❄️</button>
+
   <script>
     // ELEMENTOS
     const mainScreen = document.getElementById('main-screen');
@@ -257,149 +244,152 @@
     const notesCanvas = document.getElementById('notes-canvas');
     const flowersContainer = document.getElementById('flowers-container');
     const phrasesContainer = document.getElementById('phrases-container');
-    const musicInput = document.getElementById('music-input');
     const bgMusic = document.getElementById('bg-music');
-    const musicName = document.getElementById('music-name');
+    const playBtn = document.getElementById('play-btn');
+    const volSlider = document.getElementById('vol-slider');
+    const volUp = document.getElementById('vol-up');
+    const volDown = document.getElementById('vol-down');
+    const winterBtn = document.getElementById('winter-toggle');
+    const greetingEl = document.getElementById('greeting');
+    const clockEl = document.getElementById('clock');
+    const weatherEl = document.getElementById('weather');
+    let isWinter = false;
 
     // TRANSICIONES
     function showScreen(screen) { screen.classList.add('active'); }
     function hideScreen(screen) { screen.classList.remove('active'); }
 
-    // MUSICA
-    musicInput.addEventListener('change', e => {
-      if(e.target.files[0]) {
-        bgMusic.src = URL.createObjectURL(e.target.files[0]);
-        musicName.textContent = e.target.files[0].name.replace(/\.[^/.]+$/, "").substring(0, 18) + (e.target.files[0].name.length > 20 ? '...' : '');
-      }
-    });
-    document.getElementById('music-bar').addEventListener('click', e => {
-      if(!bgMusic.src || !bgMusic.src.startsWith('blob:')) return;
-      if(bgMusic.paused) bgMusic.play().catch(()=>{}); else bgMusic.pause();
-      document.querySelector('.music-btn').textContent = bgMusic.paused ? '▶ Reproducir' : '⏸ Pausar';
+    // HORA Y SALUDO
+    function updateClock() {
+      const now = new Date();
+      clockEl.textContent = now.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+      const h = now.getHours();
+      greetingEl.textContent = h < 12 ? 'Buen día ☀️' : h < 19 ? 'Buenas tardes 🌤️' : 'Buenas noches 🌙';
+    }
+    setInterval(updateClock, 1000); updateClock();
+
+    // CLIMA (Open-Meteo gratuito, sin API Key)
+    function getWeather() {
+      const fallback = '🌍 20°C';
+      if(!navigator.geolocation) { weatherEl.textContent = fallback; return; }
+      navigator.geolocation.getCurrentPosition(pos => {
+        fetch(`https://api.open-meteo.com/v1/forecast?latitude=${pos.coords.latitude}&longitude=${pos.coords.longitude}&current_weather=true`)
+          .then(res => res.json()).then(data => {
+            const temp = Math.round(data.current_weather.temperature);
+            const code = data.current_weather.weathercode;
+            const codes = {0:'☀️', 1:'🌤️', 2:'⛅', 3:'☁️', 45:'🌫️', 48:'🌫️', 51:'🌦️', 53:'🌧️', 61:'🌧️', 63:'🌧️', 71:'🌨️', 73:'🌨️', 77:'🌨️', 95:'⛈️'};
+            weatherEl.textContent = `${codes[code] || '☁️'} ${temp}°C`;
+          }).catch(() => weatherEl.textContent = fallback);
+      }, () => weatherEl.textContent = fallback, { timeout: 5000 });
+    }
+    setTimeout(getWeather, 1000);
+
+    // TARJETAS EDITABLES / MOVEDIZAS (SOLO CON LÁPIZ)
+    document.querySelectorAll('.edit-btn').forEach(btn => {
+      btn.addEventListener('click', e => {
+        e.stopPropagation();
+        const card = btn.closest('.msg-card');
+        const p = card.querySelector('p');
+        const isActive = btn.classList.toggle('active');
+        btn.textContent = isActive ? '✅' : '✏️';
+        
+        card.classList.toggle('is-editable', isActive);
+        p.contentEditable = isActive;
+        p.style.pointerEvents = isActive ? 'auto' : 'none';
+        
+        if(isActive) p.focus();
+      });
     });
 
-    // FLORES CAYENDO
-    const flowers = ['🌸','🌺','🌷','🌼','💮','🪷','🌻','🌹','🍃','✨','🤍','🕊️','🌿'];
-    let flowerInterval;
-    function startFlowers() {
-      flowersContainer.innerHTML = '';
-      function spawn() {
-        const el = document.createElement('div');
-        el.className = 'flower';
-        el.textContent = flowers[Math.floor(Math.random()*flowers.length)];
-        el.style.left = Math.random()*90 + '%';
-        el.style.animationDuration = (Math.random()*4 + 8) + 's';
-        el.style.fontSize = (Math.random()*1 + 1.5) + 'rem';
-        flowersContainer.appendChild(el);
-        setTimeout(() => el.remove(), 13000);
-      }
-      for(let i=0; i<6; i++) setTimeout(spawn, i*250);
-      flowerInterval = setInterval(spawn, 450);
+    // ARRASTRE DE TARJETAS (SOLO SI SON EDITABLES)
+    document.querySelectorAll('.msg-card').forEach(card => {
+      let isDrag = false, offX = 0, offY = 0;
+      card.addEventListener('pointerdown', e => {
+        if(!card.classList.contains('is-editable')) return;
+        if(e.target.closest('p') && document.activeElement === e.target.closest('p')) return;
+        isDrag = true; card.classList.add('dragging');
+        const rect = card.getBoundingClientRect();
+        offX = e.clientX - rect.left; offY = e.clientY - rect.top;
+        card.setPointerCapture(e.pointerId);
+      });
+      card.addEventListener('pointermove', e => {
+        if(!isDrag) return;
+        const nx = (e.clientX - offX) / window.innerWidth * 100;
+        const ny = (e.clientY - offY) / window.innerHeight * 100;
+        card.style.left = `${Math.max(2, Math.min(96, nx))}%`;
+        card.style.top = `${Math.max(2, Math.min(96, ny))}%`;
+      });
+      card.addEventListener('pointerup', () => { if(isDrag) { isDrag = false; card.classList.remove('dragging'); }});
+    });
+
+    // MUSICA
+    bgMusic.volume = 0.5;
+    playBtn.addEventListener('click', () => { bgMusic.paused ? (bgMusic.play(), playBtn.textContent='⏸') : (bgMusic.pause(), playBtn.textContent='▶'); });
+    volSlider.addEventListener('input', e => bgMusic.volume = parseFloat(e.target.value));
+    volUp.addEventListener('click', () => { bgMusic.volume = Math.min(1, bgMusic.volume+0.1); volSlider.value = bgMusic.volume; });
+    volDown.addEventListener('click', () => { bgMusic.volume = Math.max(0, bgMusic.volume-0.1); volSlider.value = bgMusic.volume; });
+    
+    // TAP EFECTO
+    const tapEmojis = ['💖','✨','🌸','🌼','🤍'];
+    document.addEventListener('click', e => {
+      if(e.target.closest('button, textarea, input, .music-player, .note-delete')) return;
+      const el = document.createElement('div');
+      el.textContent = tapEmojis[Math.floor(Math.random()*tapEmojis.length)];
+      el.style.cssText = `position:fixed; left:${e.clientX-10}px; top:${e.clientY-10}px; font-size:1.5rem; pointer-events:none; z-index:9999; animation:floatUp 1.2s ease-out forwards;`;
+      document.body.appendChild(el); setTimeout(() => el.remove(), 1200);
+    });
+
+    // MODO INVIERNO + NIEVE
+    const snowEmojis = ['❄️','✨','🌬️','💎','🕊️']; let snowInterval;
+    function toggleWinter() {
+      isWinter = !isWinter;
+      document.body.classList.toggle('winter-mode', isWinter);
+      winterBtn.classList.toggle('active', isWinter);
+      winterBtn.textContent = isWinter ? '☀️' : '❄️';
+      isWinter ? startSnow() : stopSnow();
     }
-    function stopFlowers() { clearInterval(flowerInterval); setTimeout(() => flowersContainer.innerHTML='', 1000); }
+    function startSnow() { flowersContainer.innerHTML=''; function spawn(){ const el=document.createElement('div'); el.className='snow'; el.textContent=snowEmojis[Math.floor(Math.random()*snowEmojis.length)]; el.style.cssText=`left:${Math.random()*95}%; animation-duration:${Math.random()*5+9}s; font-size:${Math.random()*0.8+1.2}rem;`; flowersContainer.appendChild(el); setTimeout(()=>el.remove(),15000); } for(let i=0;i<8;i++)setTimeout(spawn,i*300); snowInterval=setInterval(spawn,350); }
+    function stopSnow() { clearInterval(snowInterval); setTimeout(()=>flowersContainer.innerHTML='',1000); }
+    winterBtn.addEventListener('click', toggleWinter);
+
+    // FLORES CAYENDO (NOTAS)
+    const flowers = ['🌸','🌺','🌷','🌼','💮','🪷','🌻','🌹','🍃','✨','🤍','🕊️','🌿']; let flowerInterval;
+    function startFlowers() { flowersContainer.innerHTML=''; function spawn(){ const el=document.createElement('div'); el.className='flower'; el.textContent=flowers[Math.floor(Math.random()*flowers.length)]; el.style.cssText=`left:${Math.random()*90}%; animation-duration:${Math.random()*4+8}s; font-size:${Math.random()*1+1.5}rem;`; flowersContainer.appendChild(el); setTimeout(()=>el.remove(),13000); } for(let i=0;i<6;i++)setTimeout(spawn,i*250); flowerInterval=setInterval(spawn,450); }
+    function stopFlowers() { clearInterval(flowerInterval); setTimeout(()=>flowersContainer.innerHTML='',1000); }
 
     // FRASES CAYENDO
-    const phrases = [
-      "Tu sonrisa ilumina días enteros ☀️", "Respira profundo, todo estará bien 🌬️",
-      "Eres más fuerte de lo que crees 💪", "Un abrazo virtual lleno de cariño 🤗",
-      "No estás sola, estoy contigo 💖", "Los días difíciles también pasan 🌧️🌈",
-      "Tu corazón merece paz y calma 🕊️", "Confía en tu proceso, florecerás 🌸",
-      "Hoy descansa, mañana es otro día 🌙", "Eres digna de todo lo bonito ✨",
-      "Tu luz brilla incluso en la oscuridad 🕯️", "Permítete sentir, está bien 🤍",
-      "El mundo es mejor contigo en él 🌍💕", "Cuenta hasta 10 y suelta lo que duele 🍃",
-      "Eres amor en forma de persona 💗", "Pequeños pasos también son avances 👣",
-      "Tu valentía me inspira cada día 🌟", "Mereces días tranquilos y felices ☕",
-      "Abrazo este mensaje y lo hago realidad 🫂", "La tormenta siempre termina, lo prometo ⛈️➡️🌤️",
-      "Eres un regalo para quienes te rodean 🎁", "Sé amable contigo misma hoy 🌷",
-      "Tu energía bonita no se apaga 🔋✨", "Estoy orgullosa de ti, siempre 🥺💕",
-      "Hoy te mando todo mi cariño 💌", "Eres magia pura, nunca lo olvides 🌟"
-    ];
+    const phrases = ["Tu sonrisa ilumina días enteros ☀️","Respira profundo, todo estará bien 🌬️","Eres más fuerte de lo que crees 💪","Un abrazo virtual lleno de cariño 🤗","No estás sola, estoy contigo 💖","Los días difíciles también pasan 🌧️🌈","Tu corazón merece paz y calma 🕊️","Confía en tu proceso, florecerás 🌸","Hoy descansa, mañana es otro día 🌙","Eres digna de todo lo bonito ✨","Tu luz brilla incluso en la oscuridad 🕯️","Permítete sentir, está bien 🤍","El mundo es mejor contigo en él 🌍💕","Cuenta hasta 10 y suelta lo que duele 🍃","Eres amor en forma de persona 💗","Pequeños pasos también son avances 👣","Tu valentía me inspira cada día 🌟","Mereces días tranquilos y felices ☕","Abrazo este mensaje y lo hago realidad 🫂","La tormenta siempre termina, lo prometo ⛈️➡️🌤️","Eres un regalo para quienes te rodean 🎁","Sé amable contigo misma hoy 🌷","Tu energía bonita no se apaga 🔋✨","Estoy orgullosa de ti, siempre 🥺💕","Hoy te mando todo mi cariño 💌","Eres magia pura, nunca lo olvides 🌟"];
     let phraseInterval;
-    function startPhrases() {
-      phrasesContainer.innerHTML = '';
-      function spawn() {
-        const el = document.createElement('div');
-        el.className = 'phrase-drop';
-        el.textContent = phrases[Math.floor(Math.random()*phrases.length)];
-        el.style.left = Math.random()*80 + '%';
-        el.style.animationDuration = (Math.random()*3 + 6) + 's';
-        el.style.fontSize = (Math.random()*0.4 + 0.9) + 'rem';
-        phrasesContainer.appendChild(el);
-        setTimeout(() => el.remove(), 10000);
-      }
-      for(let i=0; i<5; i++) setTimeout(spawn, i*200);
-      phraseInterval = setInterval(spawn, 400);
-    }
-    function stopPhrases() { clearInterval(phraseInterval); setTimeout(() => phrasesContainer.innerHTML='', 1000); }
+    function startPhrases() { phrasesContainer.innerHTML=''; function spawn(){ const el=document.createElement('div'); el.className='phrase-drop'; el.textContent=phrases[Math.floor(Math.random()*phrases.length)]; el.style.cssText=`left:${Math.random()*80}%; animation-duration:${Math.random()*3+6}s; font-size:${Math.random()*0.4+0.9}rem;`; phrasesContainer.appendChild(el); setTimeout(()=>el.remove(),10000); } for(let i=0;i<5;i++)setTimeout(spawn,i*200); phraseInterval=setInterval(spawn,400); }
+    function stopPhrases() { clearInterval(phraseInterval); setTimeout(()=>phrasesContainer.innerHTML='',1000); }
 
     // NOTAS
     let notes = JSON.parse(localStorage.getItem('loveNotes') || '[]');
     let noteIdCounter = notes.length ? Math.max(...notes.map(n=>n.id)) + 1 : Date.now();
-
-    function renderNotes() {
-      notesCanvas.innerHTML = '';
-      notes.forEach(n => createNoteEl(n));
-    }
-
+    function renderNotes() { notesCanvas.innerHTML = ''; notes.forEach(n => createNoteEl(n)); }
     function createNoteEl(note) {
       const el = document.createElement('div');
-      el.className = 'sticky-note';
-      el.id = `note-${note.id}`;
-      el.style.left = `${Math.max(5, Math.min(90, note.x))}%`;
-      el.style.top = `${Math.max(10, Math.min(90, note.y))}%`;
+      el.className = 'sticky-note'; el.id = `note-${note.id}`;
+      el.style.cssText = `left:${Math.max(5, Math.min(90, note.x))}%; top:${Math.max(10, Math.min(90, note.y))}%;`;
       el.innerHTML = `<div class="note-delete">×</div><textarea placeholder="Escribe aquí...">${note.text}</textarea>`;
       notesCanvas.appendChild(el);
-
-      let isDrag = false, offX=0, offY=0;
-      el.addEventListener('pointerdown', e => {
-        if(e.target.tagName === 'TEXTAREA' || e.target.classList.contains('note-delete')) return;
-        isDrag = true; el.classList.add('dragging');
-        const rect = el.getBoundingClientRect();
-        offX = e.clientX - rect.left; offY = e.clientY - rect.top;
-        el.setPointerCapture(e.pointerId);
-      });
-      el.addEventListener('pointermove', e => {
-        if(!isDrag) return;
-        const nx = (e.clientX - offX) / window.innerWidth * 100;
-        const ny = (e.clientY - offY) / window.innerHeight * 100;
-        el.style.left = `${Math.max(5, Math.min(90, nx))}%`;
-        el.style.top = `${Math.max(10, Math.min(90, ny))}%`;
-      });
+      let isDrag = false, offX = 0, offY = 0;
+      el.addEventListener('pointerdown', e => { if(e.target.tagName === 'TEXTAREA' || e.target.classList.contains('note-delete')) return; isDrag = true; el.classList.add('dragging'); const rect = el.getBoundingClientRect(); offX = e.clientX - rect.left; offY = e.clientY - rect.top; el.setPointerCapture(e.pointerId); });
+      el.addEventListener('pointermove', e => { if(!isDrag) return; el.style.left = `${Math.max(5, Math.min(90, (e.clientX - offX) / window.innerWidth * 100))}%`; el.style.top = `${Math.max(10, Math.min(90, (e.clientY - offY) / window.innerHeight * 100))}%`; });
       el.addEventListener('pointerup', () => { if(isDrag) { isDrag = false; el.classList.remove('dragging'); saveNotes(); }});
-
-      el.querySelector('.note-delete').addEventListener('click', e => {
-        e.stopPropagation();
-        if(confirm('¿Eliminar esta nota?')) {
-          el.style.transform = 'scale(0.8)'; el.style.opacity = '0';
-          setTimeout(() => { notes = notes.filter(n => n.id !== note.id); saveNotes(); renderNotes(); }, 200);
-        }
-      });
-
-      el.querySelector('textarea').addEventListener('input', e => {
-        const n = notes.find(n => n.id === note.id);
-        if(n) n.text = e.target.value;
-        clearTimeout(n._saveT); n._saveT = setTimeout(saveNotes, 600);
-      });
+      el.querySelector('.note-delete').addEventListener('click', e => { e.stopPropagation(); if(confirm('¿Eliminar esta nota?')) { el.style.transform = 'scale(0.8)'; el.style.opacity = '0'; setTimeout(() => { notes = notes.filter(n => n.id !== note.id); saveNotes(); renderNotes(); }, 200); }});
+      el.querySelector('textarea').addEventListener('input', e => { const n = notes.find(n => n.id === note.id); if(n) n.text = e.target.value; clearTimeout(n._saveT); n._saveT = setTimeout(saveNotes, 600); });
     }
-
     function saveNotes() { localStorage.setItem('loveNotes', JSON.stringify(notes)); }
-    function addNote() {
-      const id = noteIdCounter++;
-      const newNote = { id, x: 15 + Math.random()*65, y: 15 + Math.random()*55, text: '' };
-      notes.push(newNote); saveNotes(); createNoteEl(newNote);
-      setTimeout(() => document.querySelector(`#note-${id} textarea`).focus(), 100);
-    }
+    function addNote() { const id = noteIdCounter++; const newNote = { id, x: 15 + Math.random()*65, y: 15 + Math.random()*55, text: '' }; notes.push(newNote); saveNotes(); createNoteEl(newNote); setTimeout(() => document.querySelector(`#note-${id} textarea`).focus(), 100); }
     addNoteFab.addEventListener('click', addNote);
 
     // NAVEGACIÓN
     notesBtn.addEventListener('click', () => { renderNotes(); hideScreen(mainScreen); showScreen(notesScreen); startFlowers(); });
     backNotesBtn.addEventListener('click', () => { stopFlowers(); hideScreen(notesScreen); showScreen(mainScreen); });
-    
-    hugBtn.addEventListener('click', () => { hideScreen(mainScreen); showScreen(hugScreen); startPhrases(); if(bgMusic.src && bgMusic.paused) bgMusic.play().catch(()=>{}); });
-    backHugBtn.addEventListener('click', () => { stopPhrases(); bgMusic.pause(); hideScreen(hugScreen); showScreen(mainScreen); });
-
-    // INICIALIZAR
-    document.addEventListener('DOMContentLoaded', () => { showScreen(mainScreen); });
+    hugBtn.addEventListener('click', () => { hideScreen(mainScreen); showScreen(hugScreen); startPhrases(); if(!bgMusic.paused || bgMusic.src) playBtn.textContent = '⏸'; });
+    backHugBtn.addEventListener('click', () => { stopPhrases(); playBtn.textContent = '▶'; hideScreen(hugScreen); showScreen(mainScreen); });
+    document.addEventListener('DOMContentLoaded', () => showScreen(mainScreen));
   </script>
 </body>
 </html>
