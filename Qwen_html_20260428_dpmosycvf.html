@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Para ti 💖</title>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&family=Quicksand:wght@500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --pink-light: #fff0f7;
+      --pink-soft: #ffcce6;
+      --pink-mid: #ffb3d9;
+      --pink-accent: #ff80bf;
+      --pink-dark: #e04f8a;
+      --text-main: #8a3a6b;
+      --glass: rgba(255, 255, 255, 0.65);
+      --shadow-soft: 0 8px 24px rgba(224, 79, 138, 0.2);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Nunito', sans-serif;
+      background: linear-gradient(135deg, var(--pink-light) 0%, var(--pink-soft) 50%, #ffd6e8 100%);
+      min-height: 100vh;
+      overflow: hidden;
+      color: var(--text-main);
+      position: relative;
+    }
+
+    /* PARTICULAS DE FONDO */
+    .bg-particle {
+      position: absolute;
+      color: var(--pink-accent);
+      opacity: 0.35;
+      pointer-events: none;
+      animation: float 8s ease-in-out infinite alternate;
+      font-size: 1.4rem;
+      z-index: 0;
+    }
+    @keyframes float {
+      0% { transform: translateY(0) rotate(0deg); opacity: 0.25; }
+      100% { transform: translateY(-40px) rotate(15deg); opacity: 0.5; }
+    }
+
+    /* PANTALLA PRINCIPAL */
+    #main-screen {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.5rem;
+      height: 100vh;
+      transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      z-index: 2;
+    }
+
+    .notes-container {
+      width: 24%;
+      display: flex;
+      flex-direction: column;
+      gap: 1.2rem;
+      height: 75vh;
+      overflow-y: auto;
+      padding-right: 0.5rem;
+    }
+    .notes-container::-webkit-scrollbar { width: 4px; }
+    .notes-container::-webkit-scrollbar-thumb { background: var(--pink-mid); border-radius: 10px; }
+
+    .add-note-btn {
+      background: var(--glass);
+      border: 2px dashed var(--pink-accent);
+      color: var(--pink-dark);
+      padding: 0.8rem;
+      border-radius: 14px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.2s;
+      text-align: center;
+    }
+    .add-note-btn:hover { background: #fff5fa; transform: translateY(-2px); }
+
+    .note {
+      background: #ffffff;
+      border: 1px solid #ffe0ed;
+      border-radius: 16px;
+      padding: 1rem;
+      min-height: 110px;
+      font-size: 0.95rem;
+      box-shadow: var(--shadow-soft);
+      position: relative;
+      cursor: move;
+      transition: box-shadow 0.25s, transform 0.2s;
+      line-height: 1.5;
+    }
+    .note:hover { box-shadow: 0 12px 30px rgba(224, 79, 138, 0.3); transform: translateY(-2px); }
+    .note.dragging { z-index: 1000; box-shadow: 0 15px 35px rgba(0,0,0,0.15); }
+    .note::before {
+      content: "⋮⋮";
+      position: absolute;
+      top: 6px;
+      right: 8px;
+      font-size: 0.8rem;
+      color: #d9a3c2;
+      cursor: grab;
+    }
+
+    .center-content {
+      width: 48%;
+      text-align: center;
+      background: var(--glass);
+      backdrop-filter: blur(10px);
+      padding: 2.5rem 2rem;
+      border-radius: 28px;
+      box-shadow: 0 15px 40px rgba(255, 128, 191, 0.25);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .breathe-circle {
+      position: absolute;
+      width: 180px; height: 180px;
+      background: radial-gradient(circle, rgba(255,182,214,0.4), transparent 70%);
+      border-radius: 50%;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      animation: breathe 5s ease-in-out infinite;
+      pointer-events: none;
+      z-index: 0;
+    }
+    @keyframes breathe {
+      0%, 100% { transform: translate(-50%, -50%) scale(0.9); opacity: 0.6; }
+      50% { transform: translate(-50%, -50%) scale(1.15); opacity: 1; }
+    }
+
+    .messages { position: relative; z-index: 1; }
+    .messages p {
+      font-family: 'Quicksand', sans-serif;
+      font-size: 1.25rem;
+      color: var(--pink-dark);
+      margin: 0.7rem 0;
+      font-weight: 700;
+      text-shadow: 0 2px 4px rgba(255,255,255,0.6);
+    }
+
+    #hug-btn {
+      position: relative; z-index: 2;
+      background: linear-gradient(45deg, var(--pink-accent), var(--pink-dark));
+      color: white;
+      border: none;
+      padding: 1.1rem 2.4rem;
+      font-size: 1.15rem;
+      font-weight: 700;
+      border-radius: 50px;
+      cursor: pointer;
+      margin-top: 1.5rem;
+      transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      box-shadow: 0 8px 22px rgba(255, 77, 166, 0.45);
+      animation: pulse 2.5s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { box-shadow: 0 8px 22px rgba(255, 77, 166, 0.45); }
+      50% { box-shadow: 0 12px 30px rgba(255, 77, 166, 0.6); transform: scale(1.03); }
+    }
+    #hug-btn:hover { transform: scale(1.07) !important; }
+
+    /* SECCION MUSICA */
+    #music-section {
+      position: absolute;
+      bottom: 1.5rem;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--glass);
+      padding: 0.8rem 1.5rem;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+      z-index: 3;
+      transition: opacity 0.3s;
+    }
+    #music-section input { display: none; }
+    #music-label {
+      cursor: pointer;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--text-main);
+      padding: 0.4rem 0.9rem;
+      border: 1px solid var(--pink-mid);
+      border-radius: 12px;
+      transition: all 0.2s;
+    }
+    #music-label:hover { background: var(--pink-soft); }
+    #file-name { font-size: 0.8rem; color: #b36b99; max-width: 120px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+
+    /* PANTALLA ABRAZO */
+    #hug-screen {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: radial-gradient(circle at 50% 50%, #ffccdd, #ffb3d9, #ff99cc);
+      display: flex; justify-content: center; align-items: center;
+      flex-direction: column;
+      clip-path: circle(0% at 50% 50%);
+      transition: clip-path 0.9s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 100;
+      overflow: hidden;
+    }
+    #hug-screen.active { clip-path: circle(150% at 50% 50%); }
+
+    .falling-container {
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+      pointer-events: none; overflow: hidden;
+    }
+
+    .falling-item {
+      position: absolute;
+      top: -60px;
+      animation: fallSlow linear forwards;
+      opacity: 0.9;
+    }
+    .falling-item.flower { font-size: 2.2rem; animation-timing-function: linear; }
+    .falling-item.text {
+      font-family: 'Quicksand', sans-serif;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: white;
+      text-shadow: 0 2px 6px rgba(160, 50, 90, 0.35);
+      white-space: nowrap;
+    }
+    @keyframes fallSlow {
+      0% { transform: translateY(0) rotate(0deg); opacity: 0; }
+      10% { opacity: 0.95; }
+      90% { opacity: 0.95; }
+      100% { transform: translateY(105vh) rotate(20deg); opacity: 0; }
+    }
+
+    #back-btn {
+      position: absolute; bottom: 3rem;
+      background: white; color: var(--pink-dark);
+      border: none; padding: 0.9rem 2.2rem;
+      font-size: 1rem; font-weight: 700;
+      border-radius: 30px; cursor: pointer;
+      z-index: 102;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+      transition: all 0.2s ease;
+    }
+    #back-btn:hover { transform: scale(1.06); background: #fff8fb; }
+
+    /* RESPONSIVE */
+    @media (max-width: 900px) {
+      #main-screen { flex-direction: column; padding: 1rem; gap: 1rem; }
+      .notes-container { width: 100%; height: auto; flex-direction: row; overflow-x: auto; padding-bottom: 1rem; }
+      .note { min-height: 90px; flex: 0 0 85%; }
+      .center-content { width: 100%; padding: 1.5rem; }
+      #music-section { bottom: 0.8rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <div id="main-screen">
+    <div class="notes-container" id="left-notes">
+      <button class="add-note-btn" onclick="addNote('left-notes')">+ Agregar nota</button>
+      <div class="note" contenteditable="true">Escribe algo bonito para ella aquí... 🌸</div>
+      <div class="note" contenteditable="true">Recuerdos felices... 🎀</div>
+    </div>
+
+    <div class="center-content">
+      <div class="breathe-circle"></div>
+      <div class="messages">
+        <p>✨ Hoy es un nuevo día para respirar profundo</p>
+        <p>💖 Eres más fuerte de lo que tu mente te dice</p>
+        <p>🌸 Tu presencia alegra el mundo sin que lo notes</p>
+        <p>🕊️ Está bien no estar bien, pero no estás sola</p>
+        <p>🌷 Mereces paz, amor y días tranquilos</p>
+      </div>
+      <button id="hug-btn">🤗 Abrazo Virtual</button>
+    </div>
+
+    <div class="notes-container" id="right-notes">
+      <button class="add-note-btn" onclick="addNote('right-notes')">+ Agregar nota</button>
+      <div class="note" contenteditable="true">Notas de ánimo... 💕</div>
+      <div class="note" contenteditable="true">Metas y sueños... 🌟</div>
+    </div>
+
+    <div id="music-section">
+      <span>🎵</span>
+      <label id="music-label" for="music-input">Elegir música</label>
+      <input type="file" id="music-input" accept="audio/*">
+      <span id="file-name">Ninguna seleccionada</span>
+      <audio id="bg-music" loop></audio>
+    </div>
+  </div>
+
+  <div id="hug-screen">
+    <div class="falling-container" id="falling-container"></div>
+    <button id="back-btn">← Volver a la calma</button>
+  </div>
+
+  <script>
+    // ELEMENTOS
+    const hugBtn = document.getElementById('hug-btn');
+    const hugScreen = document.getElementById('hug-screen');
+    const backBtn = document.getElementById('back-btn');
+    const fallingContainer = document.getElementById('falling-container');
+    const musicInput = document.getElementById('music-input');
+    const bgMusic = document.getElementById('bg-music');
+    const fileNameSpan = document.getElementById('file-name');
+    const mainScreen = document.getElementById('main-screen');
+
+    // DATOS
+    const flowers = ['🌸','🌺','🌷','🌼','💮','🪷','🌻','🌹','🌿','✨','💖'];
+    const phrases = [
+      "Te quiero mucho 💖", "Respira, estás a salvo 🌬️", "Eres digna de amor y paz 🌸",
+      "Un abrazo fuerte y sincero 🤗", "Tu luz brilla incluso hoy ✨", "Todo va a estar bien 🕊️",
+      "Confía en tu proceso 🌷", "Mereces días tranquilos ☕", "Estoy aquí para ti, siempre 💕",
+      "Eres increíble y valiente 💪", "Hoy descansa, mañana sonríe 🌙", "Tu corazón es un refugio 🌺",
+      "No tienes que poder con todo 🤍", "El sol vuelve a salir ☀️", "Cuenta conmigo, siempre 🤝"
+    ];
+
+    // MUSICA
+    musicInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        const url = URL.createObjectURL(file);
+        bgMusic.src = url;
+        fileNameSpan.textContent = file.name;
+        fileNameSpan.title = file.name;
+      }
+    });
+
+    // NOTAS ARRASTRABLES Y AGREGABLES
+    function setupDraggable(note) {
+      let isDragging = false;
+      let startX, startY, offsetX = 0, offsetY = 0;
+
+      note.addEventListener('pointerdown', (e) => {
+        if (e.target.closest('[contenteditable="true"]') && document.activeElement === e.target) return;
+        isDragging = true;
+        note.classList.add('dragging');
+        startX = e.clientX;
+        startY = e.clientY;
+        const style = window.getComputedStyle(note);
+        offsetX = parseFloat(style.transform.split('(')[1]?.split(')')[0]?.split(',')[0]) || 0;
+        offsetY = parseFloat(style.transform.split('(')[1]?.split(')')[0]?.split(',')[1]) || 0;
+        note.setPointerCapture(e.pointerId);
+      });
+
+      note.addEventListener('pointermove', (e) => {
+        if (!isDragging) return;
+        const dx = e.clientX - startX;
+        const dy = e.clientY - startY;
+        note.style.transform = `translate(${offsetX + dx}px, ${offsetY + dy}px)`;
+      });
+
+      note.addEventListener('pointerup', () => {
+        isDragging = false;
+        note.classList.remove('dragging');
+      });
+    }
+
+    function addNote(targetId) {
+      const container = document.getElementById(targetId);
+      const newNote = document.createElement('div');
+      newNote.className = 'note';
+      newNote.contentEditable = 'true';
+      newNote.textContent = 'Escribe aquí tu nuevo mensaje... ✨';
+      container.insertBefore(newNote, container.querySelector('.add-note-btn').nextSibling);
+      setupDraggable(newNote);
+      setTimeout(() => newNote.focus(), 50);
+    }
+
+    // Inicializar notas existentes
+    document.querySelectorAll('.note').forEach(n => setupDraggable(n));
+
+    // EFECTO DE FONDO
+    function createParticles() {
+      const symbols = ['💖','✨','🌸','🕊️','🌿','🎀'];
+      for(let i=0; i<15; i++) {
+        const p = document.createElement('div');
+        p.className = 'bg-particle';
+        p.textContent = symbols[Math.floor(Math.random()*symbols.length)];
+        p.style.left = Math.random()*95 + '%';
+        p.style.top = Math.random()*95 + '%';
+        p.style.animationDelay = Math.random()*4 + 's';
+        p.style.fontSize = (Math.random()*1 + 0.8) + 'rem';
+        document.body.appendChild(p);
+      }
+    }
+    createParticles();
+
+    // PANTALLA ABRAZO
+    let fallInterval;
+    function startFalling() {
+      fallingContainer.innerHTML = '';
+      function spawn() {
+        const isFlower = Math.random() > 0.4;
+        const el = document.createElement('div');
+        el.className = `falling-item ${isFlower ? 'flower' : 'text'}`;
+        el.textContent = isFlower ? flowers[Math.floor(Math.random()*flowers.length)] : phrases[Math.floor(Math.random()*phrases.length)];
+        el.style.left = Math.random()*85 + '%';
+        el.style.animationDuration = (Math.random()*5 + 7) + 's'; // 7 a 12 segundos (más lento)
+        if(!isFlower) el.style.fontSize = (Math.random()*0.4 + 0.9) + 'rem';
+        fallingContainer.appendChild(el);
+        setTimeout(() => { if(el.parentNode) el.parentNode.removeChild(el); }, 13000);
+      }
+      for(let i=0; i<6; i++) setTimeout(spawn, i*200);
+      fallInterval = setInterval(spawn, 400);
+    }
+
+    function stopFalling() {
+      clearInterval(fallInterval);
+      setTimeout(() => { fallingContainer.innerHTML = ''; }, 1000);
+    }
+
+    hugBtn.addEventListener('click', () => {
+      hugScreen.classList.add('active');
+      mainScreen.style.opacity = '0';
+      mainScreen.style.transform = 'scale(0.92)';
+      document.getElementById('music-section').style.opacity = '0';
+      if(bgMusic.src && !bgMusic.paused) bgMusic.play().catch(()=>{});
+      setTimeout(startFalling, 300);
+    });
+
+    backBtn.addEventListener('click', () => {
+      hugScreen.classList.remove('active');
+      stopFalling();
+      setTimeout(() => {
+        mainScreen.style.opacity = '1';
+        mainScreen.style.transform = 'scale(1)';
+        document.getElementById('music-section').style.opacity = '1';
+      }, 400);
+      bgMusic.pause();
+    });
+
+    // Permitir pausar/reproducir musica con clic en el reproductor
+    bgMusic.addEventListener('play', () => document.getElementById('music-label').textContent = '⏸ Pausar');
+    bgMusic.addEventListener('pause', () => document.getElementById('music-label').textContent = '▶ Reproducir');
+    document.getElementById('music-label').addEventListener('click', () => {
+      if(!bgMusic.src) return;
+      bgMusic.paused ? bgMusic.play() : bgMusic.pause();
+    });
+  </script>
+</body>
+</html>
