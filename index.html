@@ -1,8 +1,9 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Para ti 💖</title>
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&family=Quicksand:wght@500;700&display=swap" rel="stylesheet">
   <style>
@@ -17,28 +18,38 @@
       --text-dark: #7a3062;
       --glass: rgba(255, 255, 255, 0.7);
       --shadow: 0 8px 24px rgba(224, 79, 138, 0.2);
+      --safe-top: env(safe-area-inset-top, 0px);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
     }
 
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     body {
       font-family: 'Nunito', sans-serif;
       background: linear-gradient(135deg, var(--pink-100), var(--pink-200));
-      min-height: 100vh;
+      height: 100vh; width: 100vw;
       overflow: hidden;
       color: var(--text-dark);
+      padding-top: var(--safe-top);
+      padding-bottom: var(--safe-bottom);
     }
 
     /* SISTEMA DE PANTALLAS */
     .screen {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       opacity: 0; visibility: hidden; pointer-events: none;
-      transition: opacity 0.45s ease, visibility 0.45s;
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      transition: opacity 0.4s ease, visibility 0.4s;
+      display: flex; flex-direction: column; align-items: center;
+      overflow-y: auto; overflow-x: hidden;
     }
     .screen.active { opacity: 1; visibility: visible; pointer-events: auto; }
 
     /* PANTALLA PRINCIPAL */
-    #main-screen { background: linear-gradient(135deg, var(--pink-50), var(--pink-200)); z-index: 10; padding: 1.5rem; }
+    #main-screen {
+      background: linear-gradient(135deg, var(--pink-50), var(--pink-200));
+      z-index: 10; padding: 1.5rem 1rem;
+      justify-content: flex-start;
+      padding-bottom: calc(5rem + var(--safe-bottom));
+    }
     .messages-grid {
       display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
       gap: 1rem; width: 100%; max-width: 900px; margin-bottom: 1.5rem;
@@ -53,34 +64,37 @@
     .msg-card:focus { outline: 2px dashed var(--pink-400); background: #fff9fd; }
     .msg-card p { font-family: 'Quicksand', sans-serif; font-size: 1.1rem; font-weight: 600; line-height: 1.5; }
 
-    .main-buttons { display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center; }
+    .main-buttons {
+      display: flex; gap: 0.8rem; flex-wrap: wrap; justify-content: center;
+      width: 100%; max-width: 400px; margin-bottom: 1rem;
+    }
     .btn {
-      border: none; padding: 0.9rem 2rem; font-size: 1.05rem; font-weight: 700;
-      border-radius: 50px; cursor: pointer; transition: all 0.3s cubic-bezier(0.175,0.885,0.32,1.275);
-      box-shadow: 0 6px 15px rgba(0,0,0,0.12);
+      border: none; padding: 0.9rem 1.5rem; font-size: 1.05rem; font-weight: 700;
+      border-radius: 50px; cursor: pointer; transition: all 0.2s cubic-bezier(0.175,0.885,0.32,1.275);
+      box-shadow: 0 6px 15px rgba(0,0,0,0.12); flex: 1; min-width: 140px;
     }
     #hug-btn { background: linear-gradient(45deg, var(--pink-400), var(--pink-600)); color: white; }
     #notes-btn { background: white; color: var(--pink-600); border: 2px solid var(--pink-300); }
-    .btn:hover { transform: scale(1.05) translateY(-2px); }
-    .btn:active { transform: scale(0.97); }
+    .btn:active { transform: scale(0.96); }
 
     /* MUSICA */
     #music-bar {
-      position: fixed; bottom: 1.5rem; left: 50%; transform: translateX(-50%);
+      position: fixed; bottom: calc(1rem + var(--safe-bottom)); left: 50%; transform: translateX(-50%);
       background: var(--glass); padding: 0.6rem 1.2rem; border-radius: 20px;
       display: flex; align-items: center; gap: 0.6rem; box-shadow: var(--shadow);
-      font-size: 0.85rem; z-index: 20;
+      font-size: 0.85rem; z-index: 20; white-space: nowrap;
+      max-width: 95vw;
     }
     #music-bar input { display: none; }
     .music-btn {
       background: var(--pink-200); color: var(--pink-600); border: none;
       padding: 0.4rem 0.8rem; border-radius: 10px; cursor: pointer; font-weight: 600;
-      transition: 0.2s;
+      transition: 0.2s; flex-shrink: 0;
     }
-    .music-btn:hover { background: var(--pink-300); }
+    #music-name { color: #b36b99; font-size: 0.8rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 150px; }
 
     /* PANTALLA NOTAS */
-    #notes-screen { background: radial-gradient(circle at 30% 30%, var(--pink-100), var(--pink-200)); z-index: 30; overflow: hidden; }
+    #notes-screen { background: radial-gradient(circle at 30% 30%, var(--pink-100), var(--pink-200)); z-index: 30; }
     .falling-flowers { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; overflow: hidden; }
     .flower {
       position: absolute; top: -50px; font-size: 1.8rem;
@@ -93,19 +107,23 @@
       100% { transform: translateY(110vh) rotate(25deg); opacity: 0; }
     }
 
-    .notes-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 2; padding-top: 60px; }
+    .notes-canvas {
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+      padding-top: calc(45px + var(--safe-top));
+      padding-bottom: calc(60px + var(--safe-bottom));
+    }
     .sticky-note {
-      position: absolute; width: 170px; min-height: 130px;
+      position: absolute; width: 160px; min-height: 120px;
       background: linear-gradient(135deg, #fff9fb, #ffe6f2);
       border: 2px solid #ffcce6; border-radius: 12px; padding: 10px;
       box-shadow: 0 6px 18px rgba(200, 80, 140, 0.25);
-      font-size: 0.95rem; line-height: 1.4; cursor: grab; user-select: none;
-      transition: box-shadow 0.2s, transform 0.1s;
+      font-size: 0.9rem; line-height: 1.4; cursor: grab; user-select: none;
+      transition: box-shadow 0.2s;
     }
-    .sticky-note.dragging { cursor: grabbing; box-shadow: 0 15px 35px rgba(0,0,0,0.2); z-index: 999; }
+    .sticky-note.dragging { cursor: grabbing; box-shadow: 0 15px 35px rgba(0,0,0,0.2); z-index: 999; transform: rotate(-1deg); }
     .sticky-note textarea {
-      width: 100%; height: 90px; background: transparent; border: none;
-      resize: none; font-family: 'Nunito', sans-serif; font-size: 1rem;
+      width: 100%; height: 85px; background: transparent; border: none;
+      resize: none; font-family: 'Nunito', sans-serif; font-size: 0.95rem;
       color: var(--text-dark); outline: none;
     }
     .note-delete {
@@ -113,15 +131,14 @@
       background: #ff6b9d; color: white; border-radius: 50%; display: flex;
       align-items: center; justify-content: center; cursor: pointer;
       font-size: 0.75rem; font-weight: bold; box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-      transition: transform 0.2s;
     }
-    .note-delete:hover { transform: scale(1.2); }
 
     .fab-add {
-      position: fixed; bottom: 2rem; right: 2rem; width: 54px; height: 54px;
-      background: var(--pink-500); color: white; border: none; border-radius: 50%;
-      font-size: 2rem; cursor: pointer; box-shadow: 0 8px 20px rgba(255,77,166,0.4);
-      transition: transform 0.3s, background 0.2s; z-index: 40;
+      position: fixed; bottom: calc(1.5rem + var(--safe-bottom)); right: 1.5rem;
+      width: 50px; height: 50px; background: var(--pink-500); color: white;
+      border: none; border-radius: 50%; font-size: 1.8rem; cursor: pointer;
+      box-shadow: 0 8px 20px rgba(255,77,166,0.4); z-index: 40;
+      transition: transform 0.3s, background 0.2s;
     }
     .fab-add:hover { transform: scale(1.1) rotate(90deg); background: var(--pink-600); }
 
@@ -129,7 +146,7 @@
     #hug-screen {
       background: radial-gradient(circle at 50% 50%, var(--pink-200), var(--pink-400));
       z-index: 50; clip-path: circle(0% at 50% 50%);
-      transition: clip-path 0.8s cubic-bezier(0.4,0,0.2,1), opacity 0.4s;
+      transition: clip-path 0.8s cubic-bezier(0.4,0,0.2,1);
     }
     #hug-screen.active { clip-path: circle(150% at 50% 50%); }
     .falling-phrases { position: absolute; top:0; left:0; width:100%; height:100%; pointer-events:none; overflow:hidden; }
@@ -146,32 +163,43 @@
       100% { transform: translateY(105vh); opacity: 0; }
     }
 
-    /* BOTONES DE VOLVER (FIJOS Y VISIBLES) */
+    /* BOTONES DE VOLVER (FIJOS Y SEGUROS) */
     .back-btn {
-      position: fixed; top: 1.5rem; left: 1.5rem;
+      position: fixed; top: calc(1rem + var(--safe-top)); left: 1rem;
       background: white; color: var(--pink-600); border: 2px solid var(--pink-300);
       padding: 0.6rem 1.2rem; border-radius: 20px; font-weight: 700;
       cursor: pointer; z-index: 100; box-shadow: var(--shadow);
-      transition: 0.2s;
     }
     .back-btn:hover { transform: translateX(-3px); background: #fff8fb; }
     
     #back-hug {
-      position: fixed; bottom: 2.5rem; left: 50%; transform: translateX(-50%);
+      position: fixed; bottom: calc(2rem + var(--safe-bottom)); left: 50%; transform: translateX(-50%);
       background: white; color: var(--pink-600); border: none;
-      padding: 0.9rem 2.2rem; font-size: 1rem; font-weight: 700;
+      padding: 0.9rem 2rem; font-size: 1rem; font-weight: 700;
       border-radius: 30px; cursor: pointer; z-index: 100;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.15); transition: all 0.2s ease;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.15); width: 85%; max-width: 300px; text-align: center;
     }
-    #back-hug:hover { transform: translateX(-50%) scale(1.05); background: #fff8fb; }
+    #back-hug:active { transform: translateX(-50%) scale(0.97); }
 
-    /* RESPONSIVE */
-    @media (max-width: 700px) {
-      .messages-grid { grid-template-columns: 1fr; max-width: 95%; }
-      .main-buttons { flex-direction: column; width: 85%; }
-      .btn { width: 100%; }
-      .fab-add { bottom: 1.5rem; right: 1.5rem; width: 48px; height: 48px; font-size: 1.6rem; }
+    /* RESPONSIVE MÓVIL */
+    @media (max-width: 768px) {
+      .messages-grid { grid-template-columns: 1fr; gap: 0.8rem; margin-bottom: 1rem; }
+      .msg-card { padding: 1rem; min-height: 70px; }
       .msg-card p { font-size: 1rem; }
+      .main-buttons { flex-direction: column; width: 100%; max-width: 90%; margin: 0 auto 1rem; }
+      .btn { width: 100%; min-width: unset; padding: 0.95rem; font-size: 1.05rem; }
+      #main-screen { padding-top: 1rem; padding-bottom: calc(5.5rem + var(--safe-bottom)); }
+      .sticky-note { width: 140px; min-height: 110px; font-size: 0.85rem; }
+      .sticky-note textarea { height: 75px; font-size: 0.9rem; }
+      .fab-add { width: 46px; height: 46px; font-size: 1.6rem; right: 1rem; }
+      #music-bar { padding: 0.5rem 1rem; font-size: 0.8rem; }
+      #music-name { max-width: 120px; }
+    }
+
+    @media (max-width: 380px) {
+      .msg-card p { font-size: 0.95rem; }
+      .btn { padding: 0.85rem; font-size: 0.95rem; }
+      .sticky-note { width: 125px; min-height: 100px; }
     }
   </style>
 </head>
@@ -197,7 +225,7 @@
       <span>🎵</span>
       <label class="music-btn" for="music-input">Elegir música</label>
       <input type="file" id="music-input" accept="audio/*">
-      <span id="music-name" style="color:#b36b99; font-size:0.8rem;">Sin música</span>
+      <span id="music-name">Sin música</span>
       <audio id="bg-music" loop></audio>
     </div>
   </div>
@@ -233,13 +261,9 @@
     const bgMusic = document.getElementById('bg-music');
     const musicName = document.getElementById('music-name');
 
-    // TRANSICIONES SEGURAS
-    function showScreen(screen) {
-      screen.classList.add('active');
-    }
-    function hideScreen(screen) {
-      screen.classList.remove('active');
-    }
+    // TRANSICIONES
+    function showScreen(screen) { screen.classList.add('active'); }
+    function hideScreen(screen) { screen.classList.remove('active'); }
 
     // MUSICA
     musicInput.addEventListener('change', e => {
@@ -248,11 +272,9 @@
         musicName.textContent = e.target.files[0].name.replace(/\.[^/.]+$/, "").substring(0, 18) + (e.target.files[0].name.length > 20 ? '...' : '');
       }
     });
-
     document.getElementById('music-bar').addEventListener('click', e => {
       if(!bgMusic.src || !bgMusic.src.startsWith('blob:')) return;
-      if(bgMusic.paused) bgMusic.play().catch(()=>{});
-      else bgMusic.pause();
+      if(bgMusic.paused) bgMusic.play().catch(()=>{}); else bgMusic.pause();
       document.querySelector('.music-btn').textContent = bgMusic.paused ? '▶ Reproducir' : '⏸ Pausar';
     });
 
@@ -276,7 +298,7 @@
     }
     function stopFlowers() { clearInterval(flowerInterval); setTimeout(() => flowersContainer.innerHTML='', 1000); }
 
-    // FRASES CAYENDO (25 FRASES)
+    // FRASES CAYENDO
     const phrases = [
       "Tu sonrisa ilumina días enteros ☀️", "Respira profundo, todo estará bien 🌬️",
       "Eres más fuerte de lo que crees 💪", "Un abrazo virtual lleno de cariño 🤗",
@@ -310,7 +332,7 @@
     }
     function stopPhrases() { clearInterval(phraseInterval); setTimeout(() => phrasesContainer.innerHTML='', 1000); }
 
-    // NOTAS (CRUD + DRAG + LOCALSTORAGE)
+    // NOTAS
     let notes = JSON.parse(localStorage.getItem('loveNotes') || '[]');
     let noteIdCounter = notes.length ? Math.max(...notes.map(n=>n.id)) + 1 : Date.now();
 
@@ -328,12 +350,10 @@
       el.innerHTML = `<div class="note-delete">×</div><textarea placeholder="Escribe aquí...">${note.text}</textarea>`;
       notesCanvas.appendChild(el);
 
-      // Drag
-      let isDrag = false, startX, startY, offX=0, offY=0;
+      let isDrag = false, offX=0, offY=0;
       el.addEventListener('pointerdown', e => {
         if(e.target.tagName === 'TEXTAREA' || e.target.classList.contains('note-delete')) return;
         isDrag = true; el.classList.add('dragging');
-        startX = e.clientX; startY = e.clientY;
         const rect = el.getBoundingClientRect();
         offX = e.clientX - rect.left; offY = e.clientY - rect.top;
         el.setPointerCapture(e.pointerId);
@@ -347,7 +367,6 @@
       });
       el.addEventListener('pointerup', () => { if(isDrag) { isDrag = false; el.classList.remove('dragging'); saveNotes(); }});
 
-      // Delete
       el.querySelector('.note-delete').addEventListener('click', e => {
         e.stopPropagation();
         if(confirm('¿Eliminar esta nota?')) {
@@ -356,7 +375,6 @@
         }
       });
 
-      // Auto-save
       el.querySelector('textarea').addEventListener('input', e => {
         const n = notes.find(n => n.id === note.id);
         if(n) n.text = e.target.value;
@@ -373,17 +391,15 @@
     }
     addNoteFab.addEventListener('click', addNote);
 
-    // BOTONES Y EVENTOS
+    // NAVEGACIÓN
     notesBtn.addEventListener('click', () => { renderNotes(); hideScreen(mainScreen); showScreen(notesScreen); startFlowers(); });
     backNotesBtn.addEventListener('click', () => { stopFlowers(); hideScreen(notesScreen); showScreen(mainScreen); });
     
     hugBtn.addEventListener('click', () => { hideScreen(mainScreen); showScreen(hugScreen); startPhrases(); if(bgMusic.src && bgMusic.paused) bgMusic.play().catch(()=>{}); });
     backHugBtn.addEventListener('click', () => { stopPhrases(); bgMusic.pause(); hideScreen(hugScreen); showScreen(mainScreen); });
 
-    // Asegurar carga inicial
-    document.addEventListener('DOMContentLoaded', () => {
-      showScreen(mainScreen);
-    });
+    // INICIALIZAR
+    document.addEventListener('DOMContentLoaded', () => { showScreen(mainScreen); });
   </script>
 </body>
 </html>
